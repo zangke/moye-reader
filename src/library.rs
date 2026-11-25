@@ -15,6 +15,7 @@ use crate::{
     book::{Book, BookInfo, DEMO_ID, Format, Passage, PointInText, parse_txt},
     demo,
     epub::parse_epub,
+    pdf,
 };
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -368,7 +369,8 @@ impl Store {
         {
             Some("txt") => Format::Txt,
             Some("epub") => Format::Epub,
-            _ => bail!("请选择 TXT 或 EPUB 文件"),
+            Some("pdf") => Format::Pdf,
+            _ => bail!("请选择 TXT、EPUB 或 PDF 文件"),
         };
         let mut source = File::open(path)?;
         let metadata = source.metadata()?;
@@ -393,7 +395,14 @@ impl Store {
         }
         let mut id = hasher.finalize().to_hex().to_string();
         // Keep files with identical bytes but different declared formats distinct.
-        id.replace_range(..1, if format == Format::Txt { "0" } else { "1" });
+        id.replace_range(
+            ..1,
+            match format {
+                Format::Txt => "0",
+                Format::Epub => "1",
+                Format::Pdf => "2",
+            },
+        );
         let title = path
             .file_stem()
             .and_then(|stem| stem.to_str())
@@ -427,5 +436,6 @@ fn read_book(info: BookInfo, path: &Path) -> Result<Book> {
             parse_txt(info, &bytes)
         }
         Format::Epub => parse_epub(info, path),
+        Format::Pdf => pdf::parse(path, info),
     }
 }

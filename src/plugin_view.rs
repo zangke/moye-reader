@@ -387,7 +387,10 @@ impl Reader {
                                         .child(
                                             label(
                                                 settings.directory.as_ref().map_or_else(
-                                                    || "请选择存放 TXT 或 EPUB 的文件夹".to_owned(),
+                                                    || {
+                                                        "请选择存放 TXT、EPUB 或 PDF 的文件夹"
+                                                            .to_owned()
+                                                    },
                                                     |directory| directory.display().to_string(),
                                                 ),
                                                 13.,
@@ -1023,7 +1026,7 @@ impl Reader {
                 })
                 .when(
                     list.items.is_empty() && !list.needs_connection && !waiting,
-                    |rows| rows.child(label("这里没有 TXT 或 EPUB。", 13., p.dim)),
+                    |rows| rows.child(label("这里没有 TXT、EPUB 或 PDF。", 13., p.dim)),
                 )
                 .children(list.items.iter().enumerate().map(|(index, item)| {
                     let id = item.id.clone();

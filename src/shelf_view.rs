@@ -364,6 +364,7 @@ impl Reader {
                 let (background, ink, stripe) = match book.format {
                     crate::book::Format::Txt => (0x314a45, 0xf0e9d7, 0x9bb9a4),
                     crate::book::Format::Epub => (0x45444e, 0xf1ebdd, 0xaca4bc),
+                    crate::book::Format::Pdf => (0x553b34, 0xf4e8dc, 0xc69b86),
                 };
                 div()
                     .size_full()

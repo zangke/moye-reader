@@ -11,10 +11,11 @@ use gpui_kit::{
 };
 
 use crate::{
-    book::{Book, BookInfo, DEMO_ID, Link, Passage, PointInText, Target},
+    book::{Book, BookInfo, DEMO_ID, Format, Link, Passage, PointInText, Target},
     demo,
     library::{Annotation, Bookmark, Library, Paper, Position, ReadingMode, Store, Tone},
     pagination::{Anchor, Pagination, page_range},
+    pdf,
     pictures::{Picture, read_picture, read_shelf_scene},
     plugin_view::{PluginPage, SourcesPanel},
     shelf_folders::ShelfDialog,
@@ -501,7 +502,7 @@ impl Reader {
             files: true,
             directories: false,
             multiple: true,
-            prompt: Some("导入 TXT 或 EPUB".into()),
+            prompt: Some("导入 TXT、EPUB 或 PDF".into()),
         });
         cx.spawn_in(window, async move |weak, cx| {
             let result = paths.await;
@@ -745,6 +746,9 @@ impl Reader {
     }
 
     pub fn page_count_is_chapter(&self) -> bool {
+        if self.book.info.format == Format::Pdf {
+            return false;
+        }
         let Some(index) = self.contents_entry(self.section, 0) else {
             return false;
         };
@@ -1247,7 +1251,8 @@ impl Reader {
             .or_default()
             .insert(path.clone(), ImageState::Loading);
         self.image_fifo.push_back((book.id.clone(), path.clone()));
-        if self.image_fifo.len() > 48
+        let cache_limit = if book.format == Format::Pdf { 8 } else { 48 };
+        if self.image_fifo.len() > cache_limit
             && let Some(index) = self.image_fifo.iter().position(|(id, path)| {
                 self.pictures
                     .get(id)
@@ -1264,7 +1269,16 @@ impl Reader {
         }
         cx.spawn(async move |weak, cx| {
             let name = path.clone();
-            let result = cx.background_spawn(async move { read_picture(&archive, &name) }).await;
+            let format = book.format;
+            let result = cx
+                .background_spawn(async move {
+                    if format == Format::Pdf {
+                        pdf::render(&archive, &name)
+                    } else {
+                        read_picture(&archive, &name)
+                    }
+                })
+                .await;
             let _ = weak.update(cx, |reader, cx| {
                 let Some(state) = reader.pictures.get_mut(&book.id).and_then(|images| images.get_mut(&path)) else { return };
                 *state = result.map_or(ImageState::Failed, ImageState::Ready);

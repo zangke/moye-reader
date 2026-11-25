@@ -400,6 +400,11 @@ impl Reader {
                         f32::from(area.height).min(850.) - caption,
                     )
                 });
+                let (max_width, max_height) = if self.book.info.format == crate::book::Format::Pdf {
+                    page_area.map_or((760., 1080.), |_| (max_width, max_height))
+                } else {
+                    (max_width, max_height)
+                };
                 let factor = (max_height / height).min(max_width / width).min(1.);
                 div()
                     .w_full()
@@ -425,7 +430,9 @@ impl Reader {
                     .into_any_element()
             }
             Some(ImageState::Failed) => style::label(
-                if alt.is_empty() {
+                if self.book.info.format == crate::book::Format::Pdf {
+                    "无法显示此 PDF 页面".to_owned()
+                } else if alt.is_empty() {
                     "无法显示此插图".to_owned()
                 } else {
                     format!("插图 · {alt}")
@@ -434,9 +441,17 @@ impl Reader {
                 p.dim,
             )
             .into_any_element(),
-            _ => style::label("正在载入插图…", 12., p.dim)
-                .py(px(25.))
-                .into_any_element(),
+            _ => style::label(
+                if self.book.info.format == crate::book::Format::Pdf {
+                    "正在载入页面…"
+                } else {
+                    "正在载入插图…"
+                },
+                12.,
+                p.dim,
+            )
+            .py(px(25.))
+            .into_any_element(),
         }
     }
 

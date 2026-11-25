@@ -1,13 +1,13 @@
 # 墨页书源插件
 
-书源插件是一个独立运行的程序。墨页负责书库界面、TXT 和 EPUB 解析、去重和导入。插件负责账户连接、列出目录和下载选中的文件。
+书源插件是一个独立运行的程序。墨页负责书库界面、TXT、EPUB 和 PDF 解析、去重和导入。插件负责账户连接、列出目录和下载选中的文件。
 
 ## 构建和安装文件夹书源
 
 1. 在仓库根目录运行 `cargo build --release --locked -p moye-folder-source`。
 2. 在墨页的「插件」页点「打开插件文件夹」。在里面建一个 `folder-source` 子目录，放入 [plugin.json](folder-source/plugin.json) 和生成的 `target/release/moye-folder-source`。Windows 使用 `moye-folder-source.exe`。
 3. 回到「插件」页点「刷新」，打开「文件夹书源 → 设置」，选择存放书籍的文件夹。可指定本地文件夹或由 OneDrive 客户端同步的目录。
-4. 从书库进入「书籍来源」，打开「文件夹书源」，选择一本 TXT 或 EPUB 导入。
+4. 从书库进入「书籍来源」，打开「文件夹书源」，选择一本 TXT、EPUB 或 PDF 导入。
 
 插件文件夹默认在墨页的数据目录下。有 `MOYE_DATA_DIR` 时使用其下的 `plugins`。移除插件目录即可卸载。插件以当前系统用户身份运行，请安装可信来源的可执行文件。
 
@@ -34,7 +34,7 @@
 
 - `folder: null` 表示根目录。目录和书籍的 `id` 由插件定义，墨页按原值传回。下一页使用插件返回的不透明 `next_cursor`。
 - 列表每页最多 100 项。每项含 `id`、`name`、`kind` 和可选的 `size`（字节）。`kind` 为 `folder` 或 `book`。未登录时可以返回空列表和 `needs_connection: true`。
-- 下载时把文件写入 `output_dir`，成功响应只返回保留 `.txt` 或 `.epub` 扩展名的普通文件名。每本书上限 256 MB。墨页校验结果并在导入结束后清理临时目录。
+- 下载时把文件写入 `output_dir`，成功响应只返回保留 `.txt`、`.epub` 或 `.pdf` 扩展名的普通文件名。每本书上限 256 MB。墨页校验结果并在导入结束后清理临时目录。
 
 每行事件以换行符结束。进度事件可以发多次，最后发一个结果或错误。进度的 `completed` 和 `total` 可省略。
 

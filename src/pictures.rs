@@ -4,7 +4,7 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use anyhow::Result;
+use anyhow::{Result, ensure};
 use gpui_kit::RenderImage;
 use image::{Frame, ImageReader, Limits, Rgba, RgbaImage};
 use smallvec::smallvec;
@@ -19,6 +19,27 @@ pub struct Picture {
 }
 
 impl Picture {
+    pub fn from_rgba(mut bytes: Vec<u8>, width: u32, height: u32) -> Result<Self> {
+        ensure!(width > 0 && height > 0, "图片尺寸无效");
+        ensure!(
+            bytes.len() == width as usize * height as usize * 4,
+            "PDF 页面像素数据不完整"
+        );
+        // GPUI's render images store BGRA bytes.
+        for pixel in bytes.as_chunks_mut::<4>().0 {
+            pixel.swap(0, 2);
+        }
+        let image = RgbaImage::from_raw(width, height, bytes)
+            .ok_or_else(|| anyhow::anyhow!("无法创建 PDF 页面图像"))?;
+        let art = Arc::new(RenderImage::new(smallvec![Frame::new(image)]));
+        Ok(Self {
+            art,
+            width,
+            height,
+            glyph: OnceLock::new(),
+        })
+    }
+
     pub fn glyph(&self) -> Arc<RenderImage> {
         self.glyph
             .get_or_init(|| {

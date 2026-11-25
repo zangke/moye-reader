@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 pub enum Format {
     Txt,
     Epub,
+    Pdf,
 }
 
 impl Format {
@@ -17,6 +18,7 @@ impl Format {
         match self {
             Self::Txt => "txt",
             Self::Epub => "epub",
+            Self::Pdf => "pdf",
         }
     }
 }

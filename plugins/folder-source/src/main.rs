@@ -119,7 +119,7 @@ fn serve(stdout: &mut impl Write) -> Result<Value> {
                     .context("文件名无效")?;
                 ensure!(
                     path.is_file() && book_file(&path),
-                    "只能导入 TXT 或 EPUB 文件"
+                    "只能导入 TXT、EPUB 或 PDF 文件"
                 );
                 let source = File::open(&path)?;
                 ensure!(
@@ -204,7 +204,9 @@ fn book_file(path: &Path) -> bool {
     path.extension()
         .and_then(|extension| extension.to_str())
         .is_some_and(|extension| {
-            extension.eq_ignore_ascii_case("txt") || extension.eq_ignore_ascii_case("epub")
+            extension.eq_ignore_ascii_case("txt")
+                || extension.eq_ignore_ascii_case("epub")
+                || extension.eq_ignore_ascii_case("pdf")
         })
 }
 

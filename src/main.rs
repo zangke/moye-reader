@@ -17,6 +17,7 @@ mod shelf_folders;
 mod shelf_view;
 
 mod pagination;
+mod pdf;
 mod plugin_view;
 mod plugins;
 mod reading_view;

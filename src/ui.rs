@@ -1788,6 +1788,8 @@ impl Reader {
             }
             "left" if !modifiers.modified() => self.turn(false, cx),
             "right" if !modifiers.modified() => self.turn(true, cx),
+            "up" if !modifiers.modified() => self.page_scroll(false, window, cx),
+            "down" if !modifiers.modified() => self.page_scroll(true, window, cx),
             "pageup" => self.page_scroll(false, window, cx),
             "pagedown" | "space" => self.page_scroll(!modifiers.shift, window, cx),
             _ => return,
