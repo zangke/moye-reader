@@ -342,7 +342,7 @@ impl Reader {
                 div()
                     .mx_auto()
                     .w_full()
-                    .max_w(px(1160.))
+                    // .max_w(px(1160.))//TODO
                     .px(px(if self.handheld { 24. } else { 36. }))
                     .py(px(30.))
                     .flex()
@@ -508,7 +508,7 @@ impl Reader {
                 div()
                     .mx_auto()
                     .w_full()
-                    .max_w(px(1160.))
+                    // .max_w(px(1160.))//TODO
                     .px(px(if self.handheld { 24. } else { 36. }))
                     .pt(px(30.))
                     .pb(px(30.))

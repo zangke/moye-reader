@@ -302,6 +302,7 @@ impl Reader {
             )
     }
 
+    /// 页头
     fn chapter_header(&self, pinned: bool, width: Pixels, p: Palette, cx: &Context<Self>) -> Div {
         div()
             .h(READING_HEADER_HEIGHT)
@@ -771,6 +772,7 @@ impl Reader {
             .child(rows)
     }
 
+    /// 页脚
     fn footer(&self, p: Palette, cx: &mut Context<Self>) -> Div {
         let current = self.progress();
         let percent = format!("{:.0}%", current * 100.);
@@ -1674,7 +1676,7 @@ impl Reader {
             .absolute()
             .bottom(px(69.))
             .right(px(17.))
-            .max_w(px(440.))
+            // .max_w(px(440.))//TODO
             .max_h(px(180.))
             .flex()
             .items_start()

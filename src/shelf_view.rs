@@ -160,7 +160,7 @@ impl Reader {
             .child(
                 div()
                     .w_full()
-                    .max_w(px(1120.))
+                    // .max_w(px(1120.)) //TODO
                     .flex_1()
                     .min_h_0()
                     .flex()

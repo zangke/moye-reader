@@ -32,6 +32,7 @@ use gpui_kit::*;
 actions!(moye, [Quit]);
 
 fn main() {
+    let _ = tracing_subscriber::fmt().try_init();
     let mut handheld = cfg!(target_os = "windows");
     let mut files = Vec::new();
     let mut options = true;
@@ -65,18 +66,18 @@ fn main() {
             disabled: false,
             items: vec![MenuItem::action("退出墨页", Quit)],
         }]);
-        let (preferred, minimum) = if handheld {
+        let (_preferred, minimum) = if handheld {
             (size(px(1100.), px(760.)), size(px(640.), px(400.)))
         } else {
             (size(px(1280.), px(825.)), size(px(930.), px(595.)))
         };
-        let bounds = Bounds::centered(None, preferred, cx);
+        // let bounds = Bounds::centered(None, preferred, cx);
         let window = WindowOptions {
-            window_bounds: Some(match (handheld, std::env::consts::OS) {
-                (true, "linux") => WindowBounds::Fullscreen(bounds),
-                (true, "windows") => WindowBounds::Maximized(bounds),
-                _ => WindowBounds::Windowed(bounds),
-            }),
+            // window_bounds: Some(match (handheld, std::env::consts::OS) {
+            //     (true, "linux") => WindowBounds::Fullscreen(bounds),
+            //     (true, "windows") => WindowBounds::Maximized(bounds),
+            //     _ => WindowBounds::Windowed(bounds),
+            // }),
             window_min_size: Some(minimum),
             app_owns_titlebar_drag: cfg!(target_os = "macos"),
             titlebar: Some(TitlebarOptions {

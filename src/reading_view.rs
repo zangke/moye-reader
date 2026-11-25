@@ -13,8 +13,8 @@ use crate::{
 };
 
 const PAGE_MAX_WIDTH: Pixels = px(780.);
-const SPREAD_PAGE_MAX_WIDTH: Pixels = px(686.);
-const WIDE_SPREAD_PAGE_MAX_WIDTH: Pixels = px(854.);
+// const SPREAD_PAGE_MAX_WIDTH: Pixels = px(686.);
+// const WIDE_SPREAD_PAGE_MAX_WIDTH: Pixels = px(854.);
 const PAGE_TOP_INSET: Pixels = px(6.);
 const PAGE_BOTTOM_INSET: Pixels = px(12.);
 const PAGE_GAP: Pixels = px(12.);
@@ -25,6 +25,7 @@ struct NoteMarker {
 }
 
 impl Reader {
+    /// 页内容
     pub fn page(&self, p: Palette, window: &Window, cx: &Context<Self>) -> AnyElement {
         let view = cx.entity();
         if let Some(layout) = self.pagination.as_ref().filter(|_| self.is_paged()) {
@@ -160,15 +161,18 @@ impl Reader {
             return;
         }
         let page_width = if self.is_spread() {
-            let max_width = if !self.handheld && !self.rail_visible() {
-                WIDE_SPREAD_PAGE_MAX_WIDTH
-            } else {
-                SPREAD_PAGE_MAX_WIDTH
-            };
-            ((pane.width - px(16.) - PAGE_GAP) / 2.).min(max_width)
+            // let max_width = if !self.handheld && !self.rail_visible() {
+            //     WIDE_SPREAD_PAGE_MAX_WIDTH
+            // } else {
+            //     SPREAD_PAGE_MAX_WIDTH
+            // };
+            // ((pane.width - px(16.) - PAGE_GAP) / 2.).min(max_width)
+            (pane.width - px(16.) - PAGE_GAP) / 2.
         } else {
-            pane.width.min(PAGE_MAX_WIDTH)
+            // pane.width.min(PAGE_MAX_WIDTH)
+            pane.width
         };
+        tracing::info!("page_width {}", page_width);
         let area = size(
             page_width,
             (pane.height - PAGE_TOP_INSET - PAGE_BOTTOM_INSET).max(px(120.)),
@@ -222,6 +226,7 @@ impl Reader {
         }
     }
 
+    /// 每页行内容
     fn page_row(
         &self,
         index: usize,
@@ -239,7 +244,7 @@ impl Reader {
         let column = || {
             div()
                 .w_full()
-                .max_w(page_area.map_or(PAGE_MAX_WIDTH, |area| area.width))
+                // .max_w(page_area.map_or(PAGE_MAX_WIDTH, |area| area.width)) //TODO
                 .px(self.page_inset(page_area))
                 .relative()
                 .when(marked, |row| {
@@ -263,6 +268,7 @@ impl Reader {
             }
             let compact = (page_area.is_some() && self.is_spread()) || self.handheld;
             return (
+                // 章节标题
                 frame()
                     .child(
                         column().pt(px(14.)).pb(px(16.)).child(
@@ -288,6 +294,7 @@ impl Reader {
                 .map(|ix| (ix, self.book.title_at(ix, 0)));
             let view = view.downgrade();
             return (
+                //继续阅读
                 frame()
                     .child(column().pt(px(14.)).pb(px(42.)).child(
                         if let Some((section, name)) = next {
